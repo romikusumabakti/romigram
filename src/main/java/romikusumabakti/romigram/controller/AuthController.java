@@ -7,11 +7,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import romikusumabakti.romigram.dto.LoginDto;
 import romikusumabakti.romigram.model.Account;
-import romikusumabakti.romigram.service.AccountService;
 import romikusumabakti.romigram.service.JwtService;
 
 @RestController
@@ -19,13 +17,11 @@ import romikusumabakti.romigram.service.JwtService;
 public class AuthController {
 
     AuthenticationManager authenticationManager;
-    AccountService accountService;
     JwtService jwtService;
 
     @Autowired
-    public AuthController(AuthenticationManager authenticationManager, AccountService accountService, JwtService jwtService) {
+    public AuthController(AuthenticationManager authenticationManager, JwtService jwtService) {
         this.authenticationManager = authenticationManager;
-        this.accountService = accountService;
         this.jwtService = jwtService;
     }
 
@@ -33,8 +29,7 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody LoginDto loginDto) {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
-            UserDetails userDetails = accountService.loadUserByUsername(loginDto.getUsername());
-            String token = jwtService.create(userDetails.getUsername());
+            String token = jwtService.create(loginDto.getUsername());
             return ResponseEntity.ok(token);
         } catch (BadCredentialsException e) {
             e.printStackTrace();

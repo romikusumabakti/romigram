@@ -1,7 +1,7 @@
 package romikusumabakti.romigram.security;
 
 import com.auth0.jwt.exceptions.JWTDecodeException;
-import romikusumabakti.romigram.service.AccountService;
+import romikusumabakti.romigram.repository.AccountRepository;
 import romikusumabakti.romigram.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -21,13 +21,13 @@ import java.io.IOException;
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 
-    AccountService accountService;
     JwtService jwtService;
+    AccountRepository accountRepository;
 
     @Autowired
-    public JwtRequestFilter(AccountService accountService, JwtService jwtService) {
-        this.accountService = accountService;
+    public JwtRequestFilter(JwtService jwtService, AccountRepository accountRepository) {
         this.jwtService = jwtService;
+        this.accountRepository = accountRepository;
     }
 
     @Override
@@ -38,7 +38,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             try {
                 String username = jwtService.getIssuer(token);
                 if (jwtService.verify(token, username)) {
-                    UserDetails userDetails = accountService.loadUserByUsername(username);
+                    UserDetails userDetails = accountRepository.findByUsernameOrEmail(username, username);
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authentication);

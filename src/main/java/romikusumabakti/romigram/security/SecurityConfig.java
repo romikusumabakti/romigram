@@ -1,7 +1,5 @@
 package romikusumabakti.romigram.security;
 
-import org.springframework.security.config.http.SessionCreationPolicy;
-import romikusumabakti.romigram.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,26 +9,28 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import romikusumabakti.romigram.repository.AccountRepository;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     JwtRequestFilter jwtRequestFilter;
-    AccountService accountService;
+    AccountRepository accountRepository;
 
     @Autowired
-    public SecurityConfig(JwtRequestFilter jwtRequestFilter, AccountService accountService) {
+    public SecurityConfig(JwtRequestFilter jwtRequestFilter, AccountRepository accountRepository) {
         this.jwtRequestFilter = jwtRequestFilter;
-        this.accountService = accountService;
+        this.accountRepository = accountRepository;
     }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(accountService);
+        auth.userDetailsService(username -> accountRepository.findByUsernameOrEmail(username, username));
     }
 
     @Bean
