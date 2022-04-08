@@ -24,6 +24,7 @@ public class Account extends Base implements UserDetails {
     @Column(unique = true)
     private String email;
 
+    @JsonIgnore
     private String password;
 
     @JsonIgnore
@@ -42,26 +43,31 @@ public class Account extends Base implements UserDetails {
     @ManyToMany(mappedBy = "likes")
     private List<Post> likedPosts;
 
+    @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return new ArrayList<>();
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isEnabled() {
         return true;

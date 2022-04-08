@@ -28,6 +28,10 @@ public class Comment extends Base {
         return author.getName();
     }
 
+    public String getAuthorUsername() {
+        return author.getUsername();
+    }
+
     private String content;
 
     @CreatedDate

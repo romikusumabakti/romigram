@@ -8,6 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,6 +25,10 @@ public class Post extends Base {
         return author.getName();
     }
 
+    public String getAuthorUsername() {
+        return author.getUsername();
+    }
+
     @ElementCollection
     private List<String> photos;
 
@@ -34,9 +39,9 @@ public class Post extends Base {
 
     @JsonIgnore
     @ManyToMany
-    private List<Account> likes;
+    private List<Account> likes = new ArrayList<>();
 
-    public Boolean getIsLiked() {
+    public Boolean getLiked() {
         Account account = (Account) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return likes.stream().anyMatch(like -> Objects.equals(like.getId(), account.getId()));
     }
@@ -47,7 +52,7 @@ public class Post extends Base {
 
     @JsonIgnore
     @OneToMany(mappedBy = "target")
-    private List<Comment> comments;
+    private List<Comment> comments = new ArrayList<>();
 
     public Integer getCommentCount() {
         return comments.size();
